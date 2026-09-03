@@ -1,0 +1,32 @@
+{
+  "name": "jarvis-monorepo",
+  "version": "1.0.0",
+  "description": "Unified J.A.R.V.I.S AI Assistant - Mobile app, Gateway brain, Orchestrator, and Skills",
+  "private": true,
+  "workspaces": [
+    "apps/mobile",
+    "packages/gateway",
+    "packages/orchestrator",
+    "packages/skillz",
+    "packages/lapis",
+    "packages/route",
+    "packages/types"
+  ],
+  "scripts": {
+    "install-all": "npm install && npm run bootstrap",
+    "bootstrap": "lerna bootstrap",
+    "dev": "npm run dev --workspaces",
+    "build": "npm run build --workspaces",
+    "test": "npm run test --workspaces",
+    "dev:mobile": "cd apps/mobile && npx expo start",
+    "dev:gateway": "cd packages/gateway && npm run dev",
+    "dev:orchestrator": "cd packages/orchestrator && npm run dev",
+    "lint": "npm run lint --workspaces",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\""
+  },
+  "devDependencies": {
+    "lerna": "^7.0.0",
+    "prettier": "^3.0.0",
+    "typescript": "^5.4.0"
+  }
+}
