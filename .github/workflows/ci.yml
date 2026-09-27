@@ -21,8 +21,11 @@ name: CI
 #     containing an encryption key.
 
 on:
+  # No branch filter. This file is deployed unchanged to every repository, and
+  # two of them (jarvis-agent, jarvis-scripts) use "master" as their default
+  # branch. A "branches: [main]" filter would silently never fire there, which
+  # is the same failure as having no CI at all.
   push:
-    branches: [main]
   pull_request:
   workflow_dispatch:
 
@@ -240,6 +243,14 @@ jobs:
           done
           if [ -f pyproject.toml ]; then
             .ci-venv/bin/python -m pip install --quiet -e . || echo "::warning::editable install failed; continuing with test dependencies only"
+          fi
+          # These repositories ship a tests/ directory but do not declare pytest
+          # as a dependency, because it is a test-runner concern rather than a
+          # runtime one. Provisioning it here is the workflow's job; failing with
+          # "No module named pytest" would report a missing runner as a broken
+          # repository.
+          if [ "${{ needs.hygiene.outputs.python-tests }}" = "true" ]; then
+            .ci-venv/bin/python -m pip install --quiet pytest
           fi
 
       - name: Compile all Python sources
