@@ -45,6 +45,7 @@ jobs:
       node: ${{ steps.detect.outputs.node }}
       python: ${{ steps.detect.outputs.python }}
       python-tests: ${{ steps.detect.outputs.python-tests }}
+      python-test-path: ${{ steps.detect.outputs.python-test-path }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -69,10 +70,20 @@ jobs:
           else
             echo "python=false" >> "$GITHUB_OUTPUT"
           fi
-          if git ls-files 'tests/*' 'test/*' | grep -q .; then
-            echo "python-tests=true"  >> "$GITHUB_OUTPUT"
+          # Only a top-level tests/ or test/ counts. These repositories are
+          # often monorepos of vendored copies (project-genesis carries 19k
+          # files including a full NAS-HARNESS checkout, which brings its own
+          # tests/), so a repository-wide collection picks up other projects'
+          # suites and fails on their uninstalled dependencies.
+          if [ -d tests ] && git ls-files 'tests/*' | grep -q .; then
+            echo "python-tests=true"     >> "$GITHUB_OUTPUT"
+            echo "python-test-path=tests" >> "$GITHUB_OUTPUT"
+          elif [ -d test ] && git ls-files 'test/*' | grep -q .; then
+            echo "python-tests=true"    >> "$GITHUB_OUTPUT"
+            echo "python-test-path=test" >> "$GITHUB_OUTPUT"
           else
-            echo "python-tests=false" >> "$GITHUB_OUTPUT"
+            echo "python-tests=false"     >> "$GITHUB_OUTPUT"
+            echo "python-test-path="      >> "$GITHUB_OUTPUT"
           fi
           {
             echo "### Detected stack"
@@ -235,6 +246,11 @@ jobs:
         run: |
           set -euo pipefail
           python -m venv .ci-venv
+          # Put the venv on PATH for every later step. A test that shells out to
+          # "pytest" (rather than importing it) does not see a virtualenv that
+          # is only reachable by absolute path, and fails with a misleading
+          # "pytest: not found".
+          echo "$PWD/.ci-venv/bin" >> "$GITHUB_PATH"
           .ci-venv/bin/python -m pip install --quiet --upgrade pip
           for req in requirements-test.txt requirements.txt; do
             if [ -f "$req" ]; then
@@ -258,4 +274,7 @@ jobs:
 
       - name: Run tests
         if: needs.hygiene.outputs.python-tests == 'true'
-        run: .ci-venv/bin/python -m pytest -q
+        # Scoped to the repository's own suite, never bare "pytest", so a
+        # vendored copy of another project cannot be collected against this
+        # venv.
+        run: .ci-venv/bin/python -m pytest -q "${{ needs.hygiene.outputs.python-test-path }}"
