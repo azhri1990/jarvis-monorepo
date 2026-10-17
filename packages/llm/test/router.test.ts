@@ -26,3 +26,11 @@ test('ollama adapter parses response and surfaces HTTP errors', async () => {
   const fail = (async () => new Response('', { status: 500 })) as typeof fetch;
   await assert.rejects(new OllamaProvider('m', undefined, fail).chat(msgs), /HTTP 500/);
 });
+
+test('default router is keyless: local only unless a cloud key is set', async () => {
+  const { createDefaultRouter } = await import('../src');
+  const local = (createDefaultRouter({}) as any).providers;
+  assert.deepEqual(local.map((p: LLMProvider) => p.name), ['ollama']);
+  const both = (createDefaultRouter({ JARVIS_CLOUD_API_KEY: 'x' }) as any).providers;
+  assert.deepEqual(both.map((p: LLMProvider) => p.name), ['ollama', 'cloud']);
+});
