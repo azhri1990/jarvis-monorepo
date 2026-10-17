@@ -6,6 +6,7 @@
   "workspaces": [
     "apps/mobile",
     "packages/gateway",
+    "packages/llm",
     "packages/orchestrator",
     "packages/skillz",
     "packages/lapis",
