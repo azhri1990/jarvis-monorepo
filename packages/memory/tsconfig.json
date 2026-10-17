@@ -1,0 +1,1 @@
+{ "extends": "../../tsconfig.json", "compilerOptions": { "module": "CommonJS", "outDir": "dist", "rootDir": "src", "types": ["node"], "lib": ["ES2020", "DOM"] }, "include": ["src"] }

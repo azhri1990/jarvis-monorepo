@@ -1,0 +1,12 @@
+{
+  "name": "@jarvis/memory",
+  "version": "1.0.0",
+  "description": "Persistent, dependency-free JSON-file memory store",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "tsc -p tsconfig.test.json && node --test .test-dist/test/*.test.js"
+  },
+  "devDependencies": { "@types/node": "^20.0.0", "typescript": "^5.4.0" }
+}
