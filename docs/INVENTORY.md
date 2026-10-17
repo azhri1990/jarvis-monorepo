@@ -42,8 +42,19 @@ Rotate any credential that was ever in that repo before reusing anything from it
 ### Gaps vs. this monorepo
 No gateway/HTTP package, wake word, voice, vision, alerts, watchdog or learning yet (see JARVIS-gateway `src/` list above).
 
+### Routing repos (reviewed 2026-10)
+**NAS-ROUTE**: a full copy of upstream OmniRoute (diegosouzapw/OmniRoute, MIT, copyright diegosouzapw; ~358 providers behind one
+OpenAI-compatible endpoint with auto-fallback, Next.js, port 20128). It is not your own code, so do not vendor it. Run it as a service.
+**omniroute-config**: README only (MIT) listing connected providers (Groq, DeepSeek, NVIDIA NIM, Cloudflare, etc.) and the dashboard URL. No real config.
+**ACODE_ROUTE**: not routing code. It is a research notebook (CATALOG.md of ~1,100 collected items, MOBILE-USEFUL.md, research/) for the Android/Termux box.
+Useful facts from it: the phone has no GCC or Docker; OmniRoute runs on Node there; combos named `best` (priority failover over working
+Copilot models) and `free-all` (failover over DuckDuckGo models, no tool calling) are the dependable entries; Copilot rate-limits per model, so avoid parallel calls.
+
+**Integration decision:** no code needed in `@jarvis/llm`. Its `OpenAICompatibleProvider` already accepts a base URL, so point the cloud
+fallback at OmniRoute: `JARVIS_CLOUD_BASE_URL=http://localhost:20128/v1`, `JARVIS_CLOUD_MODEL=best`, `JARVIS_CLOUD_API_KEY=<omniroute key>`.
+Local Ollama remains first; OmniRoute handles provider fallback behind the cloud entry.
+
 ### Not yet audited
-jarvis-mega-repo, jarvis-unified, jarvis-plugins, jarvis-roadmap, jarvis-boot, NAS-ROUTE, ACODE_ROUTE,
-omniroute-config, NAS-SKILLZ, NAS-LAPIS, NAS-GET, NAS-HARNESS, NAS-SCRAPLING, termux-config,
+jarvis-mega-repo, jarvis-unified, jarvis-plugins, jarvis-roadmap, jarvis-boot, NAS-SKILLZ, NAS-LAPIS, NAS-GET, NAS-HARNESS, NAS-SCRAPLING, termux-config,
 jarvis-scripts, my-automator, llama-cpp-config, PROJECT-NAS, project-genesis.
 Also: no repository named Ultron or Iron Man exists under this account.
