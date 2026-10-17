@@ -69,3 +69,5 @@ export class Assistant {
     return this.memory.add(fact);
   }
 }
+
+export * from './adapters';
