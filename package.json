@@ -9,6 +9,7 @@
     "packages/llm",
     "packages/memory",
     "packages/consent",
+    "packages/core",
     "packages/orchestrator",
     "packages/skillz",
     "packages/lapis",
