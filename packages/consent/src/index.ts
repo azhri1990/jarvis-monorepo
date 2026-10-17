@@ -42,7 +42,7 @@ export class ConsentGate {
   async check(a: Action): Promise<boolean> {
     const decision = this.decide(a);
     let allowed = false;
-    let reason = decision;
+    let reason: string = decision;
     if (decision === 'allow') allowed = true;
     else if (decision === 'ask') {
       if (!this.prompter) reason = 'ask: no prompter, denied';
