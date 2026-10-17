@@ -39,3 +39,4 @@ dist/
 # JARVIS state
 state/
 jars/
+.test-dist/
