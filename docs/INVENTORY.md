@@ -50,9 +50,11 @@ OpenAI-compatible endpoint with auto-fallback, Next.js, port 20128). It is not y
 Useful facts from it: the phone has no GCC or Docker; OmniRoute runs on Node there; combos named `best` (priority failover over working
 Copilot models) and `free-all` (failover over DuckDuckGo models, no tool calling) are the dependable entries; Copilot rate-limits per model, so avoid parallel calls.
 
-**Integration decision:** no code needed in `@jarvis/llm`. Its `OpenAICompatibleProvider` already accepts a base URL, so point the cloud
-fallback at OmniRoute: `JARVIS_CLOUD_BASE_URL=http://localhost:20128/v1`, `JARVIS_CLOUD_MODEL=best`, `JARVIS_CLOUD_API_KEY=<omniroute key>`.
-Local Ollama remains first; OmniRoute handles provider fallback behind the cloud entry.
+**Integration decision (policy: no credentials, $0):** no code needed in `@jarvis/llm`. The default router is local Ollama only and adds no cloud
+provider unless `JARVIS_CLOUD_API_KEY` is set, so leave that unset. Do not use the `best` combo or any Copilot/OAuth/API-key provider.
+Optional keyless extra: OmniRoute's `free-all` combo (DuckDuckGo models, no tool calling, rate-limited), but `@jarvis/llm` currently
+requires a non-empty key to enable its cloud entry, so using it needs a small keyless provider option first. Not built yet.
+Never commit or paste keys; the old `jarvis-gateway-node` history already leaked some (see above).
 
 ### Not yet audited
 jarvis-mega-repo, jarvis-unified, jarvis-plugins, jarvis-roadmap, jarvis-boot, NAS-SKILLZ, NAS-LAPIS, NAS-GET, NAS-HARNESS, NAS-SCRAPLING, termux-config,
