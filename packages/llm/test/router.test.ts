@@ -34,3 +34,31 @@ test('default router is keyless: local only unless a cloud key is set', async ()
   const both = (createDefaultRouter({ JARVIS_CLOUD_API_KEY: 'x' }) as any).providers;
   assert.deepEqual(both.map((p: LLMProvider) => p.name), ['ollama', 'cloud']);
 });
+
+test('circuit breaker skips a failing provider after threshold, then recovers', async () => {
+  let calls = 0;
+  let t = 0;
+  const flaky: LLMProvider = { name: 'flaky', chat: async () => { calls++; throw new Error('x'); } };
+  const r = new LLMRouter([flaky, ok('b')], { failureThreshold: 2, cooldownMs: 1000, cacheSize: 0, now: () => t });
+  for (let i = 0; i < 4; i++) await r.chat(msgs);
+  assert.equal(calls, 2);
+  t = 2000;
+  await r.chat(msgs);
+  assert.equal(calls, 3);
+});
+
+test('times out a hung provider and falls back', async () => {
+  const hung: LLMProvider = { name: 'hung', chat: () => new Promise(() => {}) };
+  const r = await new LLMRouter([hung, ok('b')], { timeoutMs: 20 }).chat(msgs);
+  assert.equal(r.provider, 'b');
+});
+
+test('caches identical conversations', async () => {
+  let calls = 0;
+  const p: LLMProvider = { name: 'p', chat: async () => { calls++; return 'ans'; } };
+  const router = new LLMRouter([p]);
+  await router.chat(msgs);
+  const second = await router.chat(msgs);
+  assert.equal(calls, 1);
+  assert.equal(second.cached, true);
+});
