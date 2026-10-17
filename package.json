@@ -8,6 +8,7 @@
     "packages/gateway",
     "packages/llm",
     "packages/memory",
+    "packages/consent",
     "packages/orchestrator",
     "packages/skillz",
     "packages/lapis",
